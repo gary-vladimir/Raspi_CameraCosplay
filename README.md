@@ -46,9 +46,12 @@ See [images/connections.png](images/connections.png) for detailed diagrams showi
 - HDMI monitor connection
 - Camera USB connection layout
 
+![images/connections.png](images/connections.png)
+
 ## Project Inspiration
 
-The design is modeled after the Canon Rebel T8i camera. See [images/vision.png](images/vision.png) for the reference image that inspired this project.
+The design is modeled after the Canon Rebel T8i camera. See the reference image that inspired this project.
+![images/vision.png](images/vision.png)
 
 ## Network Details
 
