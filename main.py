@@ -23,9 +23,6 @@ def wake_camera(retries = 3, pause = 1.0):
     return False
 
 def take_photo(filename):
-    if not wake_camera():
-        print("camera is turned off or not connected")
-        sys.exit(1)
     print("Fotooo! :D")
     subprocess.run(["gphoto2", "--set-config", "capturetarget=1"], check=True)
     subprocess.run([
@@ -34,12 +31,25 @@ def take_photo(filename):
         "--filename", filename,
         "--force-overwrite"
     ], check=True)
-    
+
 if __name__ == "__main__":
     subprocess.run(["pkill", "-f", "gvfs-gphoto2-volume-monitor"], stderr=subprocess.DEVNULL)
     subprocess.run(["pkill", "-f", "gvfsd-gphoto2"], stderr=subprocess.DEVNULL)
-    while True:
-        if GPIO.input(4) == GPIO.LOW:
-            take_photo("5K_RobotGenio.jpg")
-            sleep(1)
-        sleep(0.1)
+
+    if not wake_camera():
+        print("camera is turned off or not connected")
+        sys.exit(1)
+
+    try:
+        while True:
+            if GPIO.input(4) == GPIO.LOW:
+                try:
+                    take_photo("5K_RobotGenio.jpg")
+                except Exception as e:
+                    print(f"Error taking photo: {e}")
+                while GPIO.input(4) == GPIO.LOW:
+                    sleep(0.05)
+                sleep(0.3)
+            sleep(0.1)
+    finally:
+        GPIO.cleanup()
