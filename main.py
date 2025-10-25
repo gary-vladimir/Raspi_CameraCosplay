@@ -1,9 +1,16 @@
 import subprocess, sys, os
-import RPi.GPIO as GPIO
+from gpiozero import Button, Servo
 from time import sleep
+from gpiozero.pins.pigpio import PiGPIOFactory
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+factory = PiGPIOFactory()
+button = Button(4, pull_up=True, bounce_time=0.3)
+s1 = Servo(17, pin_factory=factory)
+
+def set_servo_angle(angle):
+    # Map angle (0 to 180) to servo value (-1 to 1)
+    servo_value = (angle / 90.0) - 1.0
+    s1.value = servo_value
 
 def _quiet(cmd):
     return subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
@@ -33,6 +40,8 @@ def take_photo(filename):
     ], check=True)
 
 if __name__ == "__main__":
+    set_servo_angle(90)
+
     subprocess.run(["pkill", "-f", "gvfs-gphoto2-volume-monitor"], stderr=subprocess.DEVNULL)
     subprocess.run(["pkill", "-f", "gvfsd-gphoto2"], stderr=subprocess.DEVNULL)
 
@@ -43,9 +52,11 @@ if __name__ == "__main__":
     viewer = None
     try:
         while True:
-            if GPIO.input(4) == GPIO.LOW:
+            if button.is_pressed:
                 try:
+                    set_servo_angle(45)
                     take_photo("5K_RobotGenio.jpg")
+                    set_servo_angle(90)
                     # Start viewer after first photo if not already running
                     if viewer is None:
                         print("Starting image viewer...")
@@ -61,11 +72,9 @@ if __name__ == "__main__":
                         print(f"Viewer started with PID: {viewer.pid}")
                 except Exception as e:
                     print(f"Error taking photo: {e}")
-                while GPIO.input(4) == GPIO.LOW:
-                    sleep(0.05)
-                sleep(0.3)
+                button.wait_for_release()
             sleep(0.1)
     finally:
         if viewer:
             viewer.terminate()
-        GPIO.cleanup()
+        button.close()
