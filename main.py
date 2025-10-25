@@ -1,4 +1,4 @@
-import subprocess, sys
+import subprocess, sys, os
 import RPi.GPIO as GPIO
 from time import sleep
 
@@ -40,11 +40,25 @@ if __name__ == "__main__":
         print("camera is turned off or not connected")
         sys.exit(1)
 
+    viewer = None
     try:
         while True:
             if GPIO.input(4) == GPIO.LOW:
                 try:
                     take_photo("5K_RobotGenio.jpg")
+                    # Start viewer after first photo if not already running
+                    if viewer is None:
+                        print("Starting image viewer...")
+                        env = os.environ.copy()
+                        env["DISPLAY"] = ":0"
+                        viewer = subprocess.Popen([
+                            "feh",
+                            "--fullscreen",
+                            "--auto-zoom",
+                            "--reload", "1",
+                            "5K_RobotGenio.jpg"
+                        ], env=env)
+                        print(f"Viewer started with PID: {viewer.pid}")
                 except Exception as e:
                     print(f"Error taking photo: {e}")
                 while GPIO.input(4) == GPIO.LOW:
@@ -52,4 +66,6 @@ if __name__ == "__main__":
                 sleep(0.3)
             sleep(0.1)
     finally:
+        if viewer:
+            viewer.terminate()
         GPIO.cleanup()
