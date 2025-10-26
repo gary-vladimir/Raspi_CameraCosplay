@@ -36,7 +36,8 @@ def take_photo(filename):
         "gphoto2",
         "--capture-image-and-download",
         "--filename", filename,
-        "--force-overwrite"
+        "--force-overwrite",
+        "--keep"
     ], check=True)
 
 if __name__ == "__main__":
