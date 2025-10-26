@@ -41,7 +41,7 @@ def take_photo(filename):
     ], check=True)
 
 if __name__ == "__main__":
-    set_servo_angle(100)
+    set_servo_angle(120)
 
     subprocess.run(["pkill", "-f", "gvfs-gphoto2-volume-monitor"], stderr=subprocess.DEVNULL)
     subprocess.run(["pkill", "-f", "gvfsd-gphoto2"], stderr=subprocess.DEVNULL)
@@ -55,9 +55,9 @@ if __name__ == "__main__":
         while True:
             if button.is_pressed:
                 try:
-                    set_servo_angle(35)
-                    sleep(0.2)
-                    set_servo_angle(100)
+                    set_servo_angle(25)
+                    sleep(0.3)
+                    set_servo_angle(120)
                     take_photo("5K_RobotGenio.jpg")
                     
                     # Start viewer after first photo if not already running
