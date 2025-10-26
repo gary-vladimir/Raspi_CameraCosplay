@@ -15,7 +15,7 @@ def set_servo_angle(angle):
 def _quiet(cmd):
     return subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
 
-def wake_camera(retries = 3, pause = 1.0):
+def wake_camera(retries = 1200, pause = 1.0):
     for _ in range(retries):
         if _quiet(["gphoto2", "--summary"]) == 0:
             return True
@@ -40,7 +40,7 @@ def take_photo(filename):
     ], check=True)
 
 if __name__ == "__main__":
-    set_servo_angle(90)
+    set_servo_angle(100)
 
     subprocess.run(["pkill", "-f", "gvfs-gphoto2-volume-monitor"], stderr=subprocess.DEVNULL)
     subprocess.run(["pkill", "-f", "gvfsd-gphoto2"], stderr=subprocess.DEVNULL)
@@ -54,9 +54,11 @@ if __name__ == "__main__":
         while True:
             if button.is_pressed:
                 try:
-                    set_servo_angle(45)
+                    set_servo_angle(35)
+                    sleep(0.2)
+                    set_servo_angle(100)
                     take_photo("5K_RobotGenio.jpg")
-                    set_servo_angle(90)
+                    
                     # Start viewer after first photo if not already running
                     if viewer is None:
                         print("Starting image viewer...")
