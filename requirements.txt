@@ -1,0 +1,14 @@
+# RoboCamara Python dependencies — install inside the project's .venv.
+#
+# NOTE: gphoto2 is installed separately in setup/install.sh, forced from
+# PyPI so we get the wheel that BUNDLES libgphoto2 >= 2.5.34 (the Canon T8i /
+# EOS 850D USB id needs >= 2.5.31, which Raspberry Pi OS / piwheels may not
+# ship). It is listed here only for documentation.
+gphoto2          # Canon control over USB
+pygame           # full-screen HDMI rendering (live feed + photo)
+Pillow           # image handling for the QR overlay
+qrcode           # Wi-Fi-join QR code
+Flask            # mobile web app + captive portal
+waitress         # production WSGI server for Flask
+gpiozero         # GPIO reset button
+lgpio            # gpiozero backend on Raspberry Pi OS Bookworm
