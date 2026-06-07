@@ -39,10 +39,9 @@ class RoboCamara:
         server.serve_in_background(self.store)
         threading.Thread(target=self.store.run_cleanup_loop, daemon=True).start()
 
-        self.display.show_message("Starting…")
-        self.camera = cameralib.connect(self.display)
-
         try:
+            self.display.show_message("Starting…")
+            self.camera = cameralib.connect(self.display)
             while True:
                 self.display.pump()
                 if self.state == LIVE:
@@ -75,6 +74,10 @@ class RoboCamara:
     def _photo_step(self):
         if self._reset.is_set():
             self._reset.clear()
+            try:
+                self.camera.flush_events()
+            except gp.GPhoto2Error:
+                pass
             self.state = LIVE
         else:
             time.sleep(0.05)

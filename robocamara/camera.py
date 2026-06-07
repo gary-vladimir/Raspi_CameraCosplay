@@ -96,6 +96,14 @@ class Camera:
             path.folder, path.name, gp.GP_FILE_TYPE_NORMAL)
         camera_file.save(str(dest))
 
+    def flush_events(self, max_iterations=20):
+        """Discard queued events (e.g. a shot taken while a photo was shown)
+        so the live feed resumes cleanly instead of replaying an old capture."""
+        for _ in range(max_iterations):
+            event_type, _data = self._camera.wait_for_event(1)
+            if event_type == gp.GP_EVENT_TIMEOUT:
+                break
+
     # -- teardown -----------------------------------------------------------
     def close(self):
         try:
